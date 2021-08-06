@@ -33,6 +33,12 @@ OBJ		=	$(patsubst $(SRCDIR)/%, $(OBJDIR)/%, $(SRC:.c=.o))
 
 all:		$(NAME)
 
+LIBFT := libft.a
+
+$(LIBFT) : 
+	@$(MAKE) full -C libft/
+	@mv libft/$(LIBFT) .
+
 $(NAME):	$(OBJ) $(LIBFT)
 			$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LIBFT)
 
@@ -43,12 +49,6 @@ $(OBJDIR):
 
 $(OBJDIR)/%.o:	$(SRCDIR)/%.c ./includes/pushswap.h $(LIBFT)
 			$(CC) $(CFLAGS) -I ./includes -c $< -o $@
-
-LIBFT := libft.a
-
-$(LIBFT) : 
-	@$(MAKE) full -C libft/
-	@mv libft/$(LIBFT) .
 
 clean:
 			@rm -rf $(OBJDIR)

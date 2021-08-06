@@ -1,5 +1,12 @@
 NAME := push_swap
 
+CC		=	gcc -g
+
+CFLAGS	= 	-Wall -Wextra -Werror
+
+OBJDIR	=	objs
+SRCDIR	=	src
+
 SRC :=  check_args.c\
 		main.c\
 		rab.c\
@@ -12,54 +19,55 @@ SRC :=  check_args.c\
 		pab.c\
 		qsort.c\
 		input.c\
-		ft_sort.c
+		ft_sort.c\
+		rr.c\
+		ft_light_sort.c\
+		ft_buble_sort.c\
+		all_sorted.c\
+		sort_three.c\
+		sort_five.c\
+		ft_min_max.c
 
-OBJ := $(patsubst %.c, %.o, $(SRC))
+SRC		:=	$(addprefix $(SRCDIR)/, $(SRC))
+OBJ		=	$(patsubst $(SRCDIR)/%, $(OBJDIR)/%, $(SRC:.c=.o))
 
-CC := gcc -g
+all:		$(NAME)
 
-FLAGS := -Wall -Wextra -Werror -fsanitize=address
+$(NAME):	$(OBJ) $(LIBFT)
+			$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LIBFT)
 
-all: $(NAME)
+$(OBJ):		|$(OBJDIR)
 
-%.o: %.c
-	$(CC)  -c $< -o $@
+$(OBJDIR):
+			@mkdir $(OBJDIR)
+
+$(OBJDIR)/%.o:	$(SRCDIR)/%.c ./includes/pushswap.h $(LIBFT)
+			$(CC) $(CFLAGS) -I ./includes -c $< -o $@
 
 LIBFT := libft.a
-
-$(NAME) :		$(LIBFT) $(OBJ) pushswap.h
-	$(CC)  $(OBJ) -o $(NAME) $(LIBFT)
 
 $(LIBFT) : 
 	@$(MAKE) full -C libft/
 	@mv libft/$(LIBFT) .
 
-clean :
-	@$(MAKE) -C libft clean
-	rm -f $(OBJ)
+clean:
+			@rm -rf $(OBJDIR)
 
-fclean : clean
-	rm -f $(NAME) $(LIBFT) a.out
+fclean:		clean
+			@rm -f $(NAME)
 
-re : fclean all
+re:			fclean all
 
-.PHONY:			all clean fclean re
-
-test :	
-	gcc -g ft_split_cmd_args.c ft_split_utils.c libft.a
-
-test_print : $(LIBFT) $(OBJ) parser.h
-	$(CC) $(FLAGS) $(OBJ) $(LIBFT)
-
+.PHONY:		all clean fclean re
 
 leak:
 	export MallocStackLoggingNoCompact=1
 
 valg:
-
+	valgrind --leak-check=full
 
 norm:
-	norminette 	
+	norminette $(SRC) pushswap.h libft/	
 
 add:
-	git add $(SRC) push_swap.h
+	git add $(SRC) pushswap.h libft/
